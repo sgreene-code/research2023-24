@@ -1,0 +1,2558 @@
+//
+//  main.cpp
+//  breakPolymer
+//
+//  Created by Sylvia Greene on 3/28/24.
+//
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <utility>
+#include <set>
+#include <filesystem>
+#include <random>
+
+using namespace std;
+int dim = 100; //Dimensions of grid
+int DIM = dim - 1;
+
+
+template <typename TwoD>
+//Checks if the squares next to location x,y are occupied based on the occupation 2d array
+void checkNeighborsToBond(int x, int y, TwoD& array, vector<int> &nArrX, vector<int> &nArrY){
+    //first make sure its not an edge
+    if(0<x && x<DIM && 0<y && y<DIM){
+        if(array[x][y+1] == 1  || array[x][y+1] == 3){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+            
+        }
+        if(array[x][y-1] == 1 ||array[x][y-1] == 3){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+        if((array)[x+1][y] == 1 || (array)[x+1][y] == 3 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 1 || (array)[x-1][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+
+    }
+    // if its at the top but not a corner
+    else if(y== DIM && 0<x && x<DIM){
+        if((array)[x][0] == 1 || (array)[x][0] == 3){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(0);
+        
+        }
+        if((array)[x][y-1] == 1 ||(array)[x][y-1] == 3){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+           
+        }
+        if((array)[x+1][y] == 1 ||(array)[x+1][y] == 3 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+
+        }
+        if((array)[x-1][y] == 1 || (array)[x-1][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+
+    }
+    
+    //if its at the bottom but not a corner
+    else if(y == 0 && 0<x && x<DIM){
+        if((array)[x][y+1] == 1 || (array)[x][y+1] == 3 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+        }
+        if((array)[x][DIM] == 1 || (array)[x][DIM] == 3 ){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(DIM);
+        }
+        if((array)[x+1][y] == 1 || (array)[x+1][y] ==3){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 1 || (array)[x-1][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+
+    }
+    
+// if its on the left but not a corner
+    else if(x == 0 && 0<y && y<DIM){
+        if((array)[x][y+1] == 1 || (array)[x][y+1] == 3 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+        }
+        if((array)[x][y-1] == 1 || (array)[x][y-1] == 3){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+        if((array)[x+1][y] == 1 || (array)[x+1][y] == 3){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+       if((array)[DIM][y] == 1 || (array)[DIM][y] == 3){
+            //if there is a nigherbo to the left
+            nArrX.push_back(DIM);
+            nArrY.push_back(y);
+        }
+
+    }
+    
+    // if its on the right but not a corner
+    else if(x == DIM && 0<y && y<DIM){
+        if((array)[x][y+1] == 1 || (array)[x][y+1] == 3 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+        }
+        if((array)[x][y-1] == 1 ||(array)[x][y-1] == 3 ){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+       if((array)[0][y] == 1 || (array)[0][y] == 3 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(0);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 1 || (array)[x-1][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+    }
+    
+    //if its at the top left corner
+    else if(x==0 && y== DIM){
+        if((array)[x][0] == 1 || (array)[x][0] == 3 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(0);
+        }
+        if((array)[x][y-1] == 1 || (array)[x][y-1] == 3){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+       if((array)[x+1][y] == 1 || (array)[x+1][y] == 3){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+        if((array)[DIM][y] == 1 || (array)[DIM][y] == 3){
+            //if there is a nigherbo to the left
+            nArrX.push_back(DIM);
+            nArrY.push_back(y);
+        }
+
+    }
+    //if its at the top right corner
+    else if(x == DIM && y == DIM){
+        if((array)[x][0] == 1 || (array)[x][0] == 3){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(0);
+        }
+        if((array)[x][y-1] == 1 || (array)[x][y-1] == 3 ){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+        if((array)[0][y] == 1 || (array)[0][y] == 3 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(0);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 1 ||(array)[x-1][y] == 3){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+
+    }
+    //if its at the bottom left corner
+    else if(x==0 && y==0){
+        if((array)[x][y+1] == 1 || (array)[x][y+1] == 3){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+        }
+        if((array)[x][DIM] == 1 || (array)[x][DIM] == 3){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(DIM);
+        }
+        if((array)[x+1][y] == 1 || (array)[x+1][y] == 3 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+        if((array)[DIM][y] == 1 || (array)[DIM][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(DIM);
+            nArrY.push_back(y);
+        }
+    }
+    //if its at the bottom right corner
+    else if(y==0 && x==DIM){
+        if((array)[x][y+1] == 1 || (array)[x][y+1] == 3 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+        }
+        if((array)[x][DIM] == 1 || (array)[x][DIM] == 3 ){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(DIM);
+        }
+        if((array)[0][y] == 1 ||(array)[0][y] == 3){
+            // if there is a nieghor to hte right
+            nArrX.push_back(0);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 1 || (array)[x-1][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+
+    }
+
+}
+
+
+
+template <typename TwoD>
+//Checks if the squares next to location x,y are occupied based on the occupation 2d array
+void checkNeighborsToMove(int x, int y, TwoD& array, vector<int> &nArrX,vector<int> &nArrY ){
+    //first make sure its not an edge
+    //move up = 0
+    //movedown = 1
+    //moveleft = 2
+    //moveright = 3
+    if(0<x && x<DIM && 0<y && y<DIM){
+        if(array[x][y+1] == 3 || array[x][y+1] == 0 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+            
+    
+        }
+        if(array[x][y-1] == 0 ||array[x][y-1] == 3){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+        if((array)[x+1][y] == 0 || (array)[x+1][y] == 3 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 0 || (array)[x-1][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+
+    }
+// if its on the left but not a corner
+    else if(x == 0 && 0<y && y<DIM){
+        if((array)[x][y+1] == 1 || (array)[x][y+1] == 3 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+        }
+        if((array)[x][y-1] == 1 || (array)[x][y-1] == 3){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+        if((array)[x+1][y] == 1 || (array)[x+1][y] == 3){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+       if((array)[DIM][y] == 1 || (array)[DIM][y] == 3){
+            //if there is a nigherbo to the left
+            nArrX.push_back(DIM);
+            nArrY.push_back(y);
+        }
+
+    }
+    
+    // if its on the right but not a corner
+    else if(x == DIM && 0<y && y<DIM){
+        if((array)[x][y+1] == 1 || (array)[x][y+1] == 3 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+        }
+        if((array)[x][y-1] == 1 ||(array)[x][y-1] == 3 ){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+       if((array)[0][y] == 1 || (array)[0][y] == 3 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(0);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 1 || (array)[x-1][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+    }
+    
+    //if its at the top left corner
+    else if(x==0 && y== DIM){
+        if((array)[x][0] == 1 || (array)[x][0] == 3 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(0);
+        }
+        if((array)[x][y-1] == 1 || (array)[x][y-1] == 3){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+       if((array)[x+1][y] == 1 || (array)[x+1][y] == 3){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+        if((array)[DIM][y] == 1 || (array)[DIM][y] == 3){
+            //if there is a nigherbo to the left
+            nArrX.push_back(DIM);
+            nArrY.push_back(y);
+        }
+
+    }
+    //if its at the top right corner
+    else if(x == DIM && y == DIM){
+        if((array)[x][0] == 1 || (array)[x][0] == 3){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(0);
+        }
+        if((array)[x][y-1] == 1 || (array)[x][y-1] == 3 ){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+        if((array)[0][y] == 1 || (array)[0][y] == 3 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(0);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 1 ||(array)[x-1][y] == 3){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+
+    }
+    //if its at the bottom left corner
+    else if(x==0 && y==0){
+        if((array)[x][y+1] == 1 || (array)[x][y+1] == 3){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+        }
+        if((array)[x][DIM] == 1 || (array)[x][DIM] == 3){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(DIM);
+        }
+        if((array)[x+1][y] == 1 || (array)[x+1][y] == 3 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+        if((array)[DIM][y] == 1 || (array)[DIM][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(DIM);
+            nArrY.push_back(y);
+        }
+    }
+    //if its at the bottom right corner
+    else if(y==0 && x==DIM){
+        if((array)[x][y+1] == 1 || (array)[x][y+1] == 3 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+        }
+        if((array)[x][DIM] == 1 || (array)[x][DIM] == 3 ){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(DIM);
+        }
+        if((array)[0][y] == 1 ||(array)[0][y] == 3){
+            // if there is a nieghor to hte right
+            nArrX.push_back(0);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 1 || (array)[x-1][y] == 3 ){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+
+    }
+
+}
+
+
+
+
+//when the neighbor array includes 4 nieghbors, randomly selects one neighbor to collide with
+void collideW4(int x, int y, vector<int> &nArrX, vector<int> &nArrY, int& CollideX, int& CollideY){
+    srand(static_cast<unsigned int>(time(nullptr)));
+
+    // Generate a random integer between 0 and 3
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int> distribution(0, 3);
+
+    // Generate a random integer between 0 and 3
+    int RND = distribution(gen);
+    cout << "RND " << RND << endl;
+    CollideX = nArrX[RND];
+    CollideY = nArrY[RND];
+    
+}
+
+//when the neighbor array includes 3 nieghbors, randomly selects one neighbor to collide with
+void collideW3(int x, int y, vector<int> &nArrX, vector<int> &nArrY, int& CollideX, int& CollideY){
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int> distribution(0, 2);
+
+    // Generate a random integer between 0 and 3
+    int RND = distribution(gen);
+    CollideX = nArrX[RND];
+    CollideY = nArrY[RND];
+    
+}
+
+//when the neighbor array includes 2 nieghbors, randomly selects one neighbor to collide with
+void collideW2(int x, int y, vector<int> &nArrX, vector<int> &nArrY, int& CollideX, int& CollideY){
+
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int> distribution(0, 1);
+
+    // Generate a random integer between 0 and 1
+    int RND = distribution(gen);
+    CollideX = nArrX[RND];
+    CollideY = nArrY[RND];
+}
+
+//when the neighbor array includes 1 nieghbors, randomly selects one neighbor to collide with
+void collideW1(int x, int y, vector<int> &nArrX, vector<int> &nArrY, int& CollideX, int& CollideY){
+
+    CollideX = nArrX[0];
+    CollideY = nArrY[0];
+    
+}
+
+bool checkEdge(int x, int y){
+    if( x == 0 || y == 0 || y == DIM || x == DIM){
+        return true;
+    }
+    return false;
+}
+
+
+
+template <typename TwoD>
+//Checks if the squares next to location x,y are occupied based on the occupation 2d array
+void checkFor1s(int x, int y, TwoD& array, vector<int> &nArrX,vector<int> &nArrY ){
+    //first make sure its not an edge
+    if(0<x && x<DIM && 0<y && y<DIM){
+        if(array[x][y+1] == 1 ){
+            //if there is a neighbor above
+            nArrX.push_back(x);
+            nArrY.push_back(y+1);
+            
+            
+        }
+        if(array[x][y-1] == 1){
+            //if there is a nieghbor below
+            nArrX.push_back(x);
+            nArrY.push_back(y-1);
+        }
+        if((array)[x+1][y] == 1 ){
+            // if there is a nieghor to hte right
+            nArrX.push_back(x+1);
+            nArrY.push_back(y);
+        }
+        if((array)[x-1][y] == 1){
+            //if there is a nigherbo to the left
+            nArrX.push_back(x-1);
+            nArrY.push_back(y);
+        }
+        
+    }
+}
+
+class Particle
+{public:
+    Particle() : x(NULL), y(NULL), name("Null"), num(NULL) {}
+    Particle(int X, int Y,string Name, int partNum,bool recombined) : x(X), y(Y), name(Name), num(partNum), recombined(recombined) {}
+    
+    bool recombined;
+    bool readyToBond = false;
+    int polymerToBond = -1;
+    
+    int getX(){
+        return x;
+    }
+    
+    int getY()
+    {
+        return y;
+    }
+    
+    void setBonded(bool b){
+        bonded = b;
+    }
+
+    bool getBonded(){
+        return bonded;
+    }
+    
+    void setX(int X){
+        x = X;
+    }
+    
+    void setParticleNumber(int i){
+        num = i;
+    }
+    
+    int getParticleNumber()
+    {
+        return num;
+    }
+    void setY(int Y){
+   
+        y = Y;
+    }
+    
+    string getName()
+    {
+        return name;
+    }
+    
+    void move(){
+        if(0 < y && y < DIM && 0 < x && x < DIM){
+            //move any direction
+
+            float RND = (float) rand()/RAND_MAX;
+            if(RND <= 0.25){
+                y = y + 1;
+            }
+            else if (RND > 0.25 && RND <= 0.5){
+                x = x + 1;
+            }
+            else if(RND > 0.5 && RND <= 0.75){
+                x = x - 1;
+                }
+            else{
+                y = y - 1;
+            }
+        }
+        
+        else if (y == DIM && 0 < x && x < DIM){
+            // top edge not corner
+            float RND = (float) rand()/RAND_MAX;
+            if(RND <= 0.25){
+                y = 0;
+            }
+            else if (RND > 0.25 && RND <= 0.5){
+                x = x + 1;
+            }
+            else if(RND > 0.5 && RND <= 0.75){
+                x = x - 1;
+                }
+            else{
+                y = y - 1;
+            }
+        }
+        
+        else if(x == DIM && 0 < y && y < DIM){
+            //Right Edge
+            float RND = (float) rand()/RAND_MAX;
+            if(RND <= 0.25){
+                y = y + 1;
+            }
+            else if (RND > 0.25 && RND <= 0.5){
+                x = x - 1;
+            }
+            else if(RND > 0.5 && RND <= 0.75){
+                x = 0;
+                }
+            else{
+                y = y - 1;
+            }
+        }
+        
+        else if(y == 0 && 0 < x && x< DIM)
+        {
+            // Bottom edge
+            float RND = (float) rand()/RAND_MAX;
+            if(RND <= 0.25){
+                y = y + 1;
+            }
+            else if (RND > 0.25 && RND <= 0.5){
+                x = x + 1;
+            }
+            else if(RND > 0.5 && RND <= 0.75){
+                x = x - 1;
+                }
+            else{
+                y = DIM;
+            }
+        }
+        
+        else if(x == 0 && 0 < y && y < DIM){
+            // Left edge
+            float RND = (float) rand()/RAND_MAX;
+            if(RND <= 0.25){
+                y = y + 1;
+            }
+            else if (RND > 0.25 && RND <= 0.5){
+                x = x + 1;
+            }
+            else if(RND > 0.5 && RND <= 0.75){
+                x = DIM;
+                }
+            else{
+                y = y - 1;
+            }
+        }
+        
+        else if(x == 0 && y == 0){
+            //Bottom left corner
+            float RND = (float) rand()/RAND_MAX;
+            if(RND <= 0.25){
+                y = y + 1;
+            }
+            else if (RND > 0.25 && RND <= 0.5){
+                x = x + 1;
+            }
+            else if(RND > 0.5 && RND <= 0.75){
+                x = DIM;
+                }
+            else{
+                y = DIM;
+            }
+        }
+        
+        else if(x==0 && y == DIM){
+            //Top left corner
+            float RND = (float) rand()/RAND_MAX;
+            if(RND <= 0.25){
+                y = 0;
+            }
+            else if (RND > 0.25 && RND <= 0.5){
+                x = x + 1;
+            }
+            else if(RND > 0.5 && RND <= 0.75){
+                x = DIM;
+                }
+            else{
+                y = y - 1;
+            }
+        }
+        
+        else if(x == DIM && y == DIM){
+            // top right corner
+            float RND = (float) rand()/RAND_MAX;
+            if(RND <= 0.25){
+                y = 0;
+            }
+            else if (RND > 0.25 && RND <= 0.5){
+                x = 0;
+            }
+            else if(RND > 0.5 && RND <= 0.75){
+                x = x - 1;
+                }
+            else{
+                y = y - 1;
+            }
+        }
+        else if(x == DIM && y == 0){
+            // x==dim y==0
+            float RND = (float) rand()/RAND_MAX;
+            if(RND <= 0.25){
+                y = y + 1;
+            }
+            else if (RND > 0.25 && RND <= 0.5){
+                x = 0;
+            }
+            else if(RND > 0.5 && RND <= 0.75){
+                x = x - 1;
+                }
+            else{
+                y = dim - 1;
+            }
+        }
+        
+        
+    }
+    
+private:
+    int x,y,num;
+    string name;
+    bool bonded;
+};
+int findParticle(int x, int y, vector<Particle*> &pArray) {
+    for (int i = 0; i < pArray.size(); i++) {
+        if (pArray[i]->getX() == x && pArray[i]->getY() == y) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+//template <typename TwoD>
+class Chain
+{
+private:
+    int length, orientation;
+    vector<Particle*> memberArr;
+    Particle* leadParticle;
+    Particle* bottomParticle;
+    vector<int> xBondingSites;
+    vector<int> yBondingSites;
+public:
+    Chain(){}
+    set<pair <int,int> > bondingSites;
+    bool readyToBond = false;
+    int particleToBond = -1;
+    int polymerToBond = -1;
+
+
+    vector<Particle*> getMembers(){
+        return memberArr;
+    }
+    
+    int getLength() const {
+        return memberArr.size();
+    }
+        
+    void setBondingSites(int x, int y) {
+        xBondingSites.push_back(x);
+        yBondingSites.push_back(y);
+    }
+    void clearBondingSites(){
+        yBondingSites.clear();
+        xBondingSites.clear();
+    }
+    
+    vector<int> getXbondingSites(){
+         return xBondingSites;
+    }
+
+    
+    vector<int> getYbondingSites(){
+        return yBondingSites;
+    }
+        
+    bool isPointInBondingSites(int x, int y) const {
+        pair<int, int> pointToFind = make_pair(x, y);
+        return (bondingSites.find(pointToFind) != bondingSites.end());
+    }
+    
+    
+    void addMember(Particle& part){
+        if(memberArr.size() == 0){
+            setLeadParticle(part);
+            setBottomParticle(part);
+        }
+        else if(memberArr.size() >= 1){
+            if(leadParticle->getX() < part.getX()){
+                setLeadParticle(part);
+            }
+            else if(bottomParticle->getX() > part.getX()){
+                setBottomParticle(part);
+            }
+            if(leadParticle->getY() < part.getY()){
+                setLeadParticle(part);
+            }
+            else if(bottomParticle->getY() > part.getY()){
+                setBottomParticle(part);
+            }
+        }
+        
+        memberArr.push_back(&part);
+    }
+    
+    void removeMember(int i){
+        memberArr.erase(memberArr.begin() + i);
+    }
+    
+    void setLeadParticle(Particle& p){
+        leadParticle = &p;
+    }
+    
+    void setBottomParticle(Particle& p){
+        bottomParticle = &p;
+    }
+    
+    Particle* getLeadParticle(){
+        return leadParticle;
+    }
+    
+    Particle* getBottomParticle(){
+        return bottomParticle;
+    }
+    
+    int getOrientation(){
+        // 1 if up down 0 if left right
+        int topX = getLeadParticle()->getX();
+        int topY = getLeadParticle()->getY();
+        int bottomX = getBottomParticle()->getX();
+        int bottomY = getBottomParticle()->getY();
+        
+        if(topX - bottomX == 0){
+            return 1;
+        }
+        
+        if(topY - bottomY == 0){
+            return 0;
+        }
+        return 5;
+    }
+    
+    template <typename TwoD>
+    bool getTopNieghbor(TwoD& grid){
+        if(orientation == 1){
+            if(grid[getLeadParticle()->getX()][getLeadParticle()->getY() + 1 ] == 1){
+                
+            }
+            else if(grid[getLeadParticle()->getX()][getLeadParticle()->getY() + 1 ] == 2){
+                
+            }
+        }
+        if(orientation == 0){
+            if(grid[getLeadParticle()->getX() + 1][getLeadParticle()->getY() ] == 1){
+                
+            }
+            else if(grid[getLeadParticle()->getX() + 1][getLeadParticle()->getY()] == 2){
+                
+            }
+        }
+    }
+    
+    template <typename TwoD>
+    bool getBottomNieghbor(TwoD& grid){
+        if(orientation == 1){
+            if(grid[getLeadParticle()->getX()][getLeadParticle()->getY() - 1 ] == 1){
+                return true;
+            }
+            else if(grid[getLeadParticle()->getX()][getLeadParticle()->getY() - 1 ] == 2){
+                return true;
+            }
+        }
+        if(orientation == 0){
+            if(grid[getLeadParticle()->getX() - 1][getLeadParticle()->getY() ] == 1){
+                return true;
+            }
+            else if(grid[getLeadParticle()->getX() - 1][getLeadParticle()->getY()] == 2){
+                return true;
+            }
+        }
+    }
+    
+    
+    template <typename TwoD>
+    void updateGrid(TwoD& grid, vector<Particle*> &particles){
+        
+        int topX = getLeadParticle()->getX();
+        int topY = getLeadParticle()->getY();
+        int bottomX = getBottomParticle()->getX();
+        int bottomY = getBottomParticle()->getY();
+        int o =  getOrientation();
+        grid[topX][topY] = 2;
+        grid[bottomX][bottomY] = 2;
+//        cout << "top particle" << topX << " , " << topY << endl;
+//        cout << "bottom particle " << bottomX << " ," << bottomY << endl;
+
+        if(checkEdge(topX, topY) == false && checkEdge(bottomX, bottomY) == false){
+            if(o == 1){
+                grid[topX][topY] = 2;
+                grid[bottomX][bottomY] = 2;
+                
+                if(grid[topX][topY + 1] == 1){
+//                    int index = findParticle(topX, topY + 1, particles);
+//                    grid[topX][topY + 1] = 2;
+//                    particles[index]-> setBonded(true);
+//                    this->addMember(*particles[index]);
+//                    this->updateGrid(grid, particles);
+                    readyToBond = true;
+                    particleToBond = findParticle(topX, topY + 1, particles);
+                    
+                }
+                if(grid[bottomX][bottomY - 1] == 1){
+//                    int index = findParticle(bottomX,bottomY - 1, particles);
+//                    grid[bottomX][bottomY -1] = 2;
+//                    particles[index]-> setBonded(true);
+//                    this->addMember(*particles[index]);
+//                    this->updateGrid(grid, particles);
+                    readyToBond = true;
+                    particleToBond = findParticle(bottomX,bottomY - 1, particles);
+                }
+                if(grid[bottomX][bottomY - 1] != 2 && grid[bottomX][bottomY - 1] != 1){
+                    grid[bottomX][bottomY - 1] = 3;
+                    setBondingSites(bottomX, bottomY - 1);
+                    
+                }
+                if( grid[topX][topY + 1] != 1 && grid[topX][topY + 1] != 2){
+                    grid[topX][topY + 1] = 3;
+                    setBondingSites(topX, topY + 1);
+                }
+ 
+            }
+            else if(o == 0){
+//                cout << " UPDATE GRID " << endl;
+                grid[topX][topY] = 2;
+                grid[bottomX][bottomY] = 2;
+                if(grid[topX + 1][topY] == 2){
+                    setBondingSites(topX + 1, topY);
+                }
+                if(grid[bottomX - 1][bottomY] == 2){
+                    setBondingSites(bottomX - 1, bottomY);
+                }
+                if(grid[topX + 1][topY] == 0  || grid[topX + 1][topY] == 3 ){
+                    grid[topX + 1][topY] = 3;
+                    setBondingSites(topX + 1, topY );
+                    
+                }
+                if(grid[bottomX - 1][bottomY] == 0 ||grid[bottomX - 1][bottomY] == 3 ){
+                    grid[bottomX - 1][bottomY ] = 3;
+                    setBondingSites(bottomX - 1, bottomY);
+                    
+                }
+                if(grid[topX + 1][topY] == 1){
+                    int index = findParticle(topX + 1, topY, particles);
+//                    grid[topX + 1][topY ] = 2;
+//                    particles[index]->setBonded(true);
+//                    this->addMember(*particles[index]);
+//                    this -> updateGrid(grid, particles);
+                    readyToBond = true;
+                    particleToBond = index;
+                }
+                if(grid[bottomX - 1][bottomY ] == 1){
+                    int index = findParticle(bottomX -1, bottomY, particles);
+//                    grid[bottomX-1][bottomY ] = 2;
+//                    particles[index]->setBonded(true);
+//                    this->addMember(*particles[index]);
+//                    this -> updateGrid(grid, particles);
+                    readyToBond = true;
+                    particleToBond = index;
+                }
+                
+            }
+        }
+        
+        //if its on the right edge
+        else if(topX == DIM && bottomX > 0 && topY < DIM && bottomY > 0){
+            if(o == 1){
+                if(grid[topX][topY + 1 ] == 2){
+                    grid[topX][topY + 1 ] = 2;
+                }
+                
+                if(grid[bottomX][bottomY - 1] == 2){
+                    grid[bottomX][bottomY - 1] = 2;
+                }
+                if(grid[topX][topY + 1 ] == 1){
+                    int index = findParticle(topX, topY + 1, particles);
+                    grid[topX][topY + 1] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[bottomX][bottomY - 1] == 1){
+                    int index = findParticle(bottomX,bottomY - 1, particles);
+                    grid[bottomX][bottomY -1] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                
+                if(grid[topX][topY + 1] != 2 && grid[topX][topY + 1] != 1 ){
+                    grid[topX][topY + 1] = 3;
+                    setBondingSites(topX, topY + 1);
+                }
+                if(grid[bottomX][bottomY - 1] != 2 && grid[bottomX][bottomY - 1] != 1 ){
+                    grid[bottomX][bottomY - 1]= 3;
+                    setBondingSites(bottomX, bottomY - 1);
+                }
+            }
+            else if(o == 0){
+                if(grid[0][topY] == 2){
+                    grid[0][topY] = 2;
+                }
+                if(grid[bottomX - 1][bottomY] == 2){
+                    grid[bottomX -1][bottomY] = 2;
+                }
+                if(grid[0][topY] == 1){
+                    int index = findParticle(0,topY, particles);
+                    grid[0][topY] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[bottomX - 1][bottomY] == 1){
+                    int index = findParticle(bottomX -1,bottomY, particles);
+                    grid[bottomX - 1][bottomY] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[0][topY] != 2 && grid[0][topY] != 1){
+                    grid[0][topY] = 3;
+                    setBondingSites(0, topY);
+                }
+                if(grid[bottomX -1][bottomY] != 2 && grid[bottomX - 1][bottomY] != 1){
+                    grid[bottomX - 1][bottomY] = 3;
+                    setBondingSites(bottomX - 1,bottomY);
+                }
+            }
+        }
+        //if its on the left edge
+        else if(bottomX == 0 && topX < DIM && topY < DIM && bottomY > 0){
+            if(o == 1){
+                if(grid[topX][topY + 1] == 2){
+                    grid[topX][topY + 1] = 2;
+                }
+                if(grid[bottomX][bottomY - 1] == 2){
+                    grid[bottomX][bottomY - 1] = 2;
+                }
+                if(grid[topX][topY + 1 ] == 1){
+                    int index = findParticle(bottomX,bottomY - 1, particles);
+                    grid[topX][topY + 1 ] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[bottomX][bottomY - 1] == 1){
+                    int index = findParticle(bottomX,bottomY - 1, particles);
+                    grid[bottomX][bottomY -1] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[topX][topY + 1] != 2 && grid[topX][topY + 1] != 1){
+                    grid[topX][topY + 1] = 3;
+                    setBondingSites(topX, topY + 1);
+                }
+                if(grid[bottomX][bottomY -1] != 1 && grid[bottomX][bottomY -1] != 2){
+                    grid[bottomX][bottomY - 1] = 3;
+                    setBondingSites(bottomX, bottomY -1);
+                }
+            }
+            else if (o == 0){
+                cout << " RUNNING 6 " << endl;
+                if(grid[topX + 1][topY] == 2){
+                    
+                }
+                if(grid[topX + 1][topY] == 1){
+                    int index = findParticle(topX + 1,topY, particles);
+                    grid[topX + 1][topY] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[DIM][bottomY] == 2){
+                    
+                }
+                if(grid[DIM][bottomY] == 1){
+                    int index = findParticle(DIM,bottomY, particles);
+                    grid[DIM][bottomY] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[topX + 1][topY] != 1 && grid[topX + 1][topY] != 2){
+                    grid[topX + 1][topY] =3;
+                    setBondingSites(topX + 1,topY);
+                }
+                if(grid[DIM][bottomY] != 2 && grid[DIM][bottomY] != 1){
+                    grid[DIM][bottomY] = 3;
+                    setBondingSites(DIM, bottomY);
+                }
+ 
+            }
+        }
+        
+        //if its top edge
+        else if((topX < DIM && bottomX > 0) && (topY == DIM && bottomY > 0)){
+            cout << "top " << endl;
+            if(o == 1){
+                cout << " RUNNING 7 " << endl;
+                if(grid[topX][0] != 2 && grid[topX][0] != 1 && grid[bottomX][bottomY -1] != 2 && grid[bottomX][bottomY -1] != 1 ){
+                    grid[topX][0] = 3;
+                    setBondingSites(topX, 0);
+                    grid[bottomX][bottomY - 1] = 3;
+                    setBondingSites(bottomX, bottomY -1);
+                }
+                else if(grid[topX][0] == 2 && grid[bottomX][bottomY - 1] == 2){
+                    grid[topX][0] = 2;
+                    grid[bottomX][bottomY - 1] = 2;
+                }
+                else if(grid[topX][0] == 2 && grid[bottomX][bottomY - 1] == 0){
+                    grid[bottomX][bottomY - 1] = 3;
+                    setBondingSites(bottomX, bottomY -1);
+                }
+                else if(grid[topX][0] == 0 && grid[bottomX][bottomY - 1] == 2){
+                    grid[topX][0] = 3;
+                    setBondingSites(topX, 0);
+                }
+                else if(grid[topX][0] == 1 && grid[bottomX][bottomY - 1] == 0){
+                    int index = findParticle(topX,0, particles);
+                    grid[topX][0] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                else if(grid[topX][0] == 1 && grid[bottomX][bottomY - 1] == 1){
+                    int index = findParticle(topX,0, particles);
+                    grid[topX][0] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                    int index2 = findParticle(bottomX,bottomY - 1, particles);
+                    grid[bottomX][bottomY -1] = 2;
+                    particles[index2]-> setBonded(true);
+                    this->addMember(*particles[index2]);
+                    this->updateGrid(grid, particles);
+                }
+                else if(grid[topX][0] == 1 && grid[bottomX][bottomY - 1] == 2){
+                    cout << "BOND  INSSIDE" << endl;
+                    int index = findParticle(bottomX,bottomY - 1, particles);
+                    grid[bottomX][bottomY -1] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                else if(grid[topX][0] == 1 && grid[bottomX][bottomY - 1] == 3){
+                    cout << " BOND INSIDE " << endl;
+                    int index = findParticle(topX,0, particles);
+                    grid[topX][0] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                else if(grid[topX][0] == 2 && grid[bottomX][bottomY - 1] == 1){
+                    cout << " BOND INSIDE" << endl;
+                    int index = findParticle(bottomX,bottomY - 1, particles);
+                    grid[bottomX][bottomY -1] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                else if(grid[topX][0] == 3 && grid[bottomX][bottomY - 1] == 1){
+                    cout << "BOND InSIdE" << endl;
+                    int index = findParticle(bottomX,bottomY - 1, particles);
+                    grid[bottomX][bottomY -1] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                else if(grid[topX][0] == 0 && grid[bottomX][bottomY - 1] == 1){
+                    cout << "BOND INSIDE " << endl;
+                    int index = findParticle(bottomX,bottomY - 1, particles);
+                    grid[bottomX][bottomY -1] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                
+            }
+            else if(o == 0){
+                cout << " RUNNING 8 " << endl;
+                if(grid[bottomX -1][bottomY] == 2){
+                    
+                }
+                if(grid[bottomX - 1][bottomY] == 1){
+                    cout << "BONDING INSDE" << endl;
+                    int index = findParticle(bottomX - 1,bottomY, particles);
+                    grid[bottomX -1][bottomY] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[topX + 1][topY] == 2){
+                    
+                }
+                if(grid[topX + 1][topY] == 1){
+                    cout <<"BONDING INSDE" << endl;
+                    int index = findParticle(topX + 1,topY, particles);
+                    grid[topX + 1][topY] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[bottomX - 1][bottomY] != 2 && grid[bottomX -1][bottomY] !=1){
+                    grid[bottomX - 1][bottomY] =3;
+                    setBondingSites(bottomX -1, bottomY);
+                }
+                if(grid[topX + 1][topY] != 2 && grid[topX][topY] != 1){
+                    grid[topX + 1][topY] = 3;
+                    setBondingSites(topX +1, topY);
+                }
+
+             }
+        }
+        
+        //if its bottom edge
+        else if(bottomX == 0 && topX < DIM && topY < DIM && bottomY > 0){
+            cout << " RUNNING 9 " << endl;
+            cout << "bottom " << endl;
+            if(o == 1){
+                if(grid[topX][topY + 1] == 2){
+                    
+                }
+                if(grid[topX][topY + 1] == 1){
+                    cout << " bonding inside " << endl;
+                    int index = findParticle(topX,topY + 1, particles);
+                    grid[topX][topY + 1] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[topX][topY + 1] != 2 && grid[topX][topY +1] != 1){
+                    grid[topX][topY + 1] =3;
+                    setBondingSites(topX, topY + 1);
+                }
+                if(grid[bottomX][DIM] == 1){
+                    cout << "BONDING INSIDE" << endl;
+                    int index = findParticle(bottomX,DIM, particles);
+                    grid[bottomX][DIM] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[bottomX][DIM] != 1 && grid[bottomX][DIM] != 2){
+                    grid[bottomX][DIM] = 3;
+                    setBondingSites(bottomX, DIM);
+                }
+
+            }
+            else if(o == 0){
+                cout << " RUNNING 10 " << endl;
+                if(grid[topX + 1][topY] == 1){
+                    cout<< "BONDING INSIDE" << endl;
+                    int index = findParticle(topX + 1,topY, particles);
+                    grid[topX + 1][topY] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[topX + 1][topY] != 1 && grid[topX + 1][topY] != 2){
+                    grid[topX + 1][topY] = 3;
+                    setBondingSites(topX + 1, topY);
+                }
+                if(grid[bottomX -1][bottomY] == 1){
+                    cout << "BONDING INSIDE" << endl;
+                    int index = findParticle(bottomX -1,bottomY, particles);
+                    grid[bottomX -1][bottomY] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[bottomX -1][bottomY] != 2 && grid[bottomX -1][bottomY] != 1){
+                    grid[bottomX -1][bottomY] =3;
+                    setBondingSites(bottomX -1, bottomY);
+                }
+            }
+        }
+        
+        //if its in the right top corner
+        else if(bottomX > 0 && topX == DIM && topY == DIM && bottomY > 0){
+            cout << "Running " <<endl;
+            if(o == 1){
+                if(grid[topX][0] == 1){
+                    cout << "BONDING INSIDE " << endl;
+                    int index = findParticle(topX,0, particles);
+                    grid[topX][0] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[topX][0] != 2 && grid[topX][0] != 1){
+                    grid[topX][0] = 3;
+                    setBondingSites(topX,0);
+                }
+                if(grid[bottomX][bottomY -1] == 1){
+                    cout << "BONDING INSIDE" << endl;
+                    int index = findParticle(bottomX,bottomY - 1, particles);
+                    grid[bottomX][bottomY -1] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[bottomX][bottomY -1] != 2 && grid[bottomX][bottomY -1] != 1){
+                    grid[bottomX][bottomY -1] = 3;
+                    setBondingSites(bottomX, bottomY - 1);
+                }
+               
+                
+            }
+            else if(o == 0){
+                if(grid[0][topY] == 1){
+                    cout << " Bonding INSIde " << endl;
+                    int index = findParticle(0,topY, particles);
+                    grid[0][topY] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[bottomX -1][topY] == 1){
+                    cout << "BONDINF INIDE" << endl;
+                    int index = findParticle(bottomX - 1,bottomY, particles);
+                    grid[bottomX -1][bottomY ] = 2;
+                    particles[index]-> setBonded(true);
+                    this->addMember(*particles[index]);
+                    this->updateGrid(grid, particles);
+                }
+                if(grid[0][topY] != 2 && grid[0][topY] != 1){
+                    grid[0][topY] = 3;
+                    setBondingSites(0, topY);
+                }
+                if(grid[bottomX -1][topY] != 2 && grid[bottomX -1][topY] != 1){
+                    grid[bottomX -1][topY] = 3;
+                    setBondingSites(bottomX -1, topY);
+                }
+            }
+        }
+        //if its in the left top corner
+        else if((bottomX == 0 && bottomY == DIM)  || (topY == DIM && topX == 0)){
+            cout << " RUNNING 23 " << endl;
+            cout << "left tio " << endl;
+            if(o == 1){
+                if(grid[topX][0] == 1){
+                    cout << "BODNIgn INSIDE " << endl;
+                }
+                if(grid[bottomX][bottomY - 1] == 1){
+                    cout << "bonding inside " << endl;
+                }
+                if(grid[topX][0] != 1 && grid[topX][0] != 1){
+                    grid[topX][0] =3;
+                    setBondingSites(topX, 0);
+                }
+                if(grid[bottomX][bottomY -1] != 2 && grid[bottomX][bottomY -1] != 1){
+                    grid[bottomX][bottomY - 1] =3;
+                    setBondingSites(bottomX, bottomY -1);
+                }
+              
+            }
+            else if (o == 0){
+                if(grid[DIM][bottomY] == 1){
+                    cout << "BONGIND INSIDE" << endl;
+                }
+                if(grid[topX + 1][topY] == 1){
+                    cout << "boNDING INSIDE" << endl;
+                }
+                if(grid[DIM][bottomY] != 2 && grid[DIM][bottomY] != 1){
+                    grid[DIM][bottomY]=3;
+                    setBondingSites(DIM, bottomY);
+                }
+                if(grid[topX + 1][topY] != 2 && grid[topX +1][topY] != 1){
+                    grid[topX + 1][topY] = 3;
+                    setBondingSites(topX + 1, topY);
+                }
+                
+            }
+        }
+        // if its in the bottom right corner
+        else if(bottomX == DIM || topX == DIM){
+            cout << "running " << endl;
+            if(topY == 0 || bottomY ==  0){
+                if(o == 1){
+                    if(grid[topX][topY + 1] == 1){
+                        cout << "Bonding inside " << endl;
+                    }
+                    if(grid[bottomX][DIM] == 1){
+                        cout << "bonding iside" << endl;
+                    }
+                    if(grid[topX][topY + 1] != 1 && grid[topX][topY + 1] != 2){
+                        grid[topX][topY + 1]=3;
+                        setBondingSites(topX, topY + 1);
+                    }
+                    if(grid[bottomX][DIM] != 2 && grid[bottomX][DIM] != 1){
+                        grid[bottomX][DIM] = 3;
+                        setBondingSites(bottomX, DIM);
+                    }
+                    
+                }
+                else if(o == 0){
+                    if(grid[0][topY] == 1){
+                        cout << "bonding inside " << endl;
+                    }
+                    if(grid[bottomX -1][bottomY] == 1){
+                        cout << "Bonding inside " << endl;
+                    }
+                    if(grid[0][topY] != 2 && grid[0][topY] != 1){
+                        grid[0][topY] = 3;
+                        setBondingSites(0, topY);
+                    }
+                    if(grid[bottomX -1][bottomY] != 2 && grid[bottomX -1][bottomY] != 1){
+                        grid[bottomX -1][bottomY] = 3;
+                        setBondingSites(bottomX -1, bottomY);
+                    }
+                  
+            
+                }
+            }
+        }
+        //if its in the bottom left corner
+        else if(bottomX == 0 && bottomY == 0){
+            cout << "bottom left" << endl;
+            if(o == 1){
+                if(grid[topX][topY + 1]){
+                    cout << "BONDING INSIDE " << endl;
+                }
+                if(grid[topX][topY + 1] != 1 && grid[topX][topY + 1] != 2){
+                    grid[topX][topY + 1] = 3;
+                    setBondingSites(topX, topY + 1);
+                }
+                if(grid[bottomX][DIM] == 1){
+                    cout << " BONDING INSIDE " << endl;
+                }
+                if(grid[bottomX][DIM] != 2 && grid[bottomX][DIM] != 1){
+                    grid[bottomX][DIM] = 3;
+                    setBondingSites(bottomX, DIM);
+                }
+              
+            }
+            else if (o == 0){
+                if(grid[topX + 1][topY] == 1){
+                    cout << " ONONGIN INSIDE" << endl;
+                }
+                if (grid[topX + 1][topY] != 2 && grid[topX + 1][topY] != 1){
+                    grid[topX + 1][topY] = 3;
+                    setBondingSites(topX + 1, topY);
+                }
+                if(grid[DIM][bottomY] == 1){
+                    cout << "BONDING INSIDE " << endl;
+                }
+                if(grid[DIM][bottomY] != 1 && grid[DIM][bottomY] != 2){
+                    grid[DIM][bottomY] = 3;
+                    setBondingSites(DIM, bottomY);
+                }
+            }
+        }
+        else if(topX == DIM && bottomX == 0){
+
+            if(grid[topX - 1][topY] != 1 && grid[topX - 1][topY] != 2){
+                grid[topX - 1][topY] = 3;
+                setBondingSites(topX -1, topY);
+            }
+            if(grid[bottomX + 1][bottomY] != 1 && grid[bottomX + 1][bottomY] != 2){
+                grid[bottomX + 1][bottomY] = 3;
+                cout << " Running inside here " << endl;
+                setBondingSites(bottomX + 1, bottomY);
+            }
+        }
+        else if(topY == DIM && bottomY == 0){
+            if(grid[topX][topY - 1] != 1 && grid[topX][topY - 1] != 2 ){
+                cout << "RUNNNING INSIDE HERE " << endl;
+                grid[topX][topY - 1] = 3;
+                setBondingSites(topX, topY -1);
+            }
+            if(grid[bottomX][bottomY + 1] != 1 && grid[bottomX][bottomY + 1] != 2){
+                grid[bottomX][bottomY + 1] = 3;
+                setBondingSites(bottomX, bottomY + 1);
+                cout << "RUNNNING inside here " << endl;
+            }
+        }
+        
+    }
+
+
+};
+
+int findPolymerSite(int x, int y, vector<Chain*>& pArray) {
+    for (int i = 0; i < pArray.size(); i++) {
+        for(int j = 0; j < pArray[i]->getXbondingSites().size(); j++){
+            if(pArray[i]->getXbondingSites()[j] == x && pArray[i]->getYbondingSites()[j] == y){
+                return i;
+               
+            }
+        }
+        
+    }
+    return -1; // Return -1 if the site is not found
+}
+
+
+template <typename TwoD>
+void bond(Particle& p, TwoD& grid,int Cx, int Cy,vector<Particle*>& particles, vector<Chain*>& polymers){
+    
+    if(grid[Cx][Cy] == 3){
+
+   
+            grid[p.getX()][p.getY()] = 0;
+            int polymerIndex = findPolymerSite(Cx, Cy, polymers);
+            p.setX(Cx);
+            p.setY(Cy);
+            p.setBonded(true);
+            polymers[polymerIndex]->addMember(p);
+            polymers[polymerIndex]->updateGrid(grid,particles);
+            
+    
+    }
+    else if(grid[Cx][Cy] == 1){
+        Chain* poly = new Chain();
+
+        polymers.push_back(poly);
+        poly->addMember(p);
+        int index = findParticle(Cx, Cy, particles);
+        particles[index]->setBonded(true);
+        poly->addMember(*particles[index]);
+        poly->updateGrid(grid,particles);
+        p.setBonded(true);
+        particles[index]->setBonded(true);
+        
+     }
+    
+}
+int findPolymer(int x,int y, vector<Chain*> &pArray){
+    for(int i=0; i < pArray.size(); i++){
+        for(int j = 0; j< pArray[i]->getMembers().size(); j++){
+            if(pArray[i]->getMembers()[j]->getX() == x &&pArray[i]->getMembers()[j]->getY() == y ){
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+
+
+template <typename TwoD>
+void bondToPolymer(Particle& p, TwoD& grid,int Cx, int Cy,vector<Particle*>& particles, vector<Chain*>& polymers, int polymerIndex){
+    polymers[polymerIndex]->addMember(p);
+    p.setBonded(true);
+    polymers[polymerIndex]->updateGrid(grid,particles);
+}
+
+float calculateMoveProbability(){
+    float T = 300;
+    float dt  = 0.01;
+    float Eaj;
+    float nuj;
+    float ratej;
+    float probj;
+    
+    nuj = 6e4;//attempt jump frequency
+    Eaj = .18;//activation energy for jump in eV .18
+    
+    ratej = nuj*exp(-Eaj/T*11610);//jumping rate
+    probj = ratej*dt;
+    cout << "move probability: " << probj << endl;
+    return probj;
+}
+
+float calculatePolymerMoveProbability(){
+    float T = 300;
+    float dt  = 0.01;
+    float Eaj;
+    float nuj;
+    float ratej;
+    float probj;
+    
+    nuj = 6e3;//attempt jump frequency
+    Eaj = 0.5;//activation energy for jump in eVc .18
+    
+    ratej = nuj*exp(-Eaj/T*11610);//jumping rate
+    probj = ratej*dt;
+    cout << " polymer move probability: " << probj << endl;
+    return probj;
+}
+
+float calculateBondProbability(){
+    float T = 300;
+    float dt = 0.01;
+    
+    float Eab;
+    float nub;
+    float rateb;
+    float probb;
+    
+    nub = 6e4;//attempt bond frequency
+    Eab = 0.5;//activation energy for bond in eV
+    
+    rateb = nub*exp(-Eab/T*11610);//bonding rate
+    
+    probb = rateb*dt;//prob of a bond
+//    cout << "bond probability: " << probb << endl;
+    return probb;
+//    return 0;
+
+}
+
+float calculatePolymerBondProbability(){
+    float T = 300;
+    float dt = 0.01;
+    
+    float Eab;
+    float nub;
+    float rateb;
+    float probb;
+    
+    nub = 6e4;//attempt bond frequency
+    Eab = 0.5;//activation energy for bond in eV
+    
+    rateb = nub*exp(-Eab/T*11610);//bonding rate
+    
+    probb = rateb*dt;//prob of a bond
+    cout << " Polymer bond probability: " << probb << endl;
+    return probb;
+//    return 0;
+}
+
+
+float calculatePolymerBreakProbability(){
+    float T = 300;
+    float dt = 0.01;
+    
+    float Eab;
+    float nub;
+    float rateb;
+    float probb;
+    
+    nub = 6e4;//attempt bond frequency
+    Eab = 0.5;//activation energy for bond in eV
+    
+    rateb = nub*exp(-Eab/T*11610);//bonding rate
+    
+    probb = rateb*dt;//prob of a bond
+    cout << "break probability: " << probb << endl;
+    return probb;
+//    return 0;
+}
+
+int generateRandomNumber(int min, int max) {
+    return min + std::rand() % (max - min + 1);
+}
+
+template <typename TwoD>
+void populate(int nP, std::vector<Particle*>& pArray, TwoD& array) {
+    std::srand(static_cast<unsigned>(std::time(nullptr))); // Seed the random number generator
+
+    int i = 0;
+    while (i < nP) {
+        int RND1 = generateRandomNumber(dim * 1 / 10, dim * 9 / 10); // Adjusted range for the middle 80% of the x dimension
+        int RND2 = generateRandomNumber(dim * 1 / 10, dim * 9 / 10);
+
+        // Check if the position is within the bounds of the array
+        if (RND1 >= 0 && RND1 < dim && RND2 >= 0 && RND2 < dim) {
+            // Check if the position is already occupied
+            if (array[RND1][RND2] == 0) {
+                Particle* p = new Particle(RND1, RND2, "Particle " + std::to_string(i), i, false);
+                array[RND1][RND2] = 1;
+                pArray.push_back(p);
+                i++;
+            }
+        }
+    }
+}
+
+
+
+
+float RndNum()
+{
+    return float(rand())/float(RAND_MAX);
+}
+
+template <typename TwoD>
+void polymerCheckBond(int polymerIndex,TwoD& grid, Chain* &polymer, vector<Particle *> &particles, vector<Chain*> &polymers){
+    if(polymer->getOrientation() == 1){
+        if( grid[polymer->getLeadParticle()->getX()][polymer->getLeadParticle()->getY() + 1] == 1 ){
+            polymer->readyToBond = true;
+            int index = findParticle(polymer->getLeadParticle()->getX(), polymer->getLeadParticle()->getY() + 1, particles);
+            particles[index]->readyToBond = true;
+            particles[index]->polymerToBond = polymerIndex;
+            polymer->particleToBond = index;
+            
+        }
+        if(grid[polymer->getLeadParticle()->getX()][polymer->getLeadParticle()->getY() + 1] == 2){
+            int pIndex = findPolymer(polymer->getLeadParticle()->getX(), polymer->getLeadParticle()->getY() + 1, polymers);
+            if(polymers[pIndex]->getOrientation() == 1){
+                polymer->readyToBond = true;
+                polymer->polymerToBond = pIndex;
+                polymers[pIndex]->readyToBond = true;
+                polymers[pIndex]->polymerToBond = polymerIndex;
+            }
+
+            
+        }
+        if( grid[polymer->getBottomParticle()->getX()][polymer->getBottomParticle()->getY() - 1] == 1 ){
+            polymer->readyToBond = true;
+            int index = findParticle(polymer->getBottomParticle()->getX(), polymer->getBottomParticle()->getY() - 1, particles);
+            particles[index]->readyToBond = true;
+            particles[index]->polymerToBond = polymerIndex;
+            polymer->particleToBond = index;
+        }
+        if(grid[polymer->getBottomParticle()->getX()][polymer->getBottomParticle()->getY() - 1] == 2){
+            int pIndex = findPolymer(polymer->getBottomParticle()->getX(), polymer->getBottomParticle()->getY() - 1, polymers);
+            if(polymers[pIndex]->getOrientation() == 1){
+                polymer->readyToBond = true;
+                polymer->polymerToBond = pIndex;
+                polymers[pIndex]->readyToBond = true;
+                polymers[pIndex]->polymerToBond = polymerIndex;
+            }
+        }
+    }
+    
+    if(polymer->getOrientation() == 0 ){
+        if(grid[polymer->getLeadParticle()->getX()+1][polymer->getLeadParticle()->getY()] == 1 ){
+            polymer->readyToBond = true;
+            int index = findParticle(polymer->getLeadParticle()->getX()+1, polymer->getLeadParticle()->getY(), particles);
+            particles[index]->readyToBond = true;
+            particles[index]->polymerToBond = polymerIndex;
+            polymer->particleToBond = index;
+            
+        }
+        if(grid[polymer->getLeadParticle()->getX()+1][polymer->getLeadParticle()->getY()] == 2){
+            int pIndex = findPolymer(polymer->getLeadParticle()->getX()+1, polymer->getLeadParticle()->getY() , polymers);
+            if(polymers[pIndex]->getOrientation() == 0){
+                polymer->readyToBond = true;
+                polymer->polymerToBond = pIndex;
+                polymers[pIndex]->readyToBond = true;
+                polymers[pIndex]->polymerToBond = polymerIndex;
+            }
+        }
+        if(grid[polymer->getBottomParticle()->getX() - 1][polymer->getBottomParticle()->getY()] == 1){
+            polymer->readyToBond = true;
+            int index = findParticle(polymer->getBottomParticle()->getX()-1, polymer->getBottomParticle()->getY(), particles);
+            particles[index]->readyToBond = true;
+            particles[index]->polymerToBond = polymerIndex;
+            polymer->particleToBond = index;
+            
+        }
+        if(grid[polymer->getBottomParticle()->getX() - 1][polymer->getBottomParticle()->getY()] == 2 ){
+            int pIndex = findPolymer(polymer->getBottomParticle()->getX()-1, polymer->getBottomParticle()->getY() , polymers);
+            if(polymers[pIndex]->getOrientation() == 0){
+                polymer->readyToBond = true;
+                polymer->polymerToBond = pIndex;
+                polymers[pIndex]->readyToBond = true;
+                polymers[pIndex]->polymerToBond = polymerIndex;
+            }
+        }
+        
+    }
+    
+    
+}
+
+
+template <typename TwoD>
+void polymerCheckMove(int polymerIndex,TwoD& grid, Chain* &polymer, vector<Particle *> &particles, vector<Chain*> &polymers, vector<int> &moveArr){
+    // move up = 0
+    //move down = 1
+    //move left = 2
+    //move right = 3
+    
+    moveArr.push_back(0);
+    moveArr.push_back(1);
+    moveArr.push_back(2);
+    moveArr.push_back(3);
+    
+    
+    //orienation is up and down
+    if(polymer->getOrientation() == 1){
+        for(int i =0; i < polymer->getLength(); i++){
+            // check move right
+            if(grid[polymer->getMembers()[i]->getX() + 1][polymer->getMembers()[i]->getY()] == 2 ||grid[polymer->getMembers()[i]->getX() + 1][polymer->getMembers()[i]->getY()] == 1 ){
+                moveArr.erase(moveArr.begin() + 3);
+            }
+            // check move left
+            if(grid[polymer->getMembers()[i]->getX() - 1][polymer->getMembers()[i]->getY()] == 2 ||grid[polymer->getMembers()[i]->getX() - 1][polymer->getMembers()[i]->getY()] == 1 ){
+                moveArr.erase(moveArr.begin() + 2);
+            }
+        }
+        
+        if(grid[polymer->getLeadParticle()->getX()][polymer->getLeadParticle()->getY() + 1] == 2 ){
+            moveArr.erase(moveArr.begin() + 0);
+        }
+        if(grid[polymer->getLeadParticle()->getX()][polymer->getLeadParticle()->getY() - 1] == 2 ){
+            moveArr.erase(moveArr.begin() + 1);
+        }
+    }
+    
+    if(polymer->getOrientation() == 0){
+        for(int i =0; i < polymer->getLength(); i++){
+            // check move up
+            if(grid[polymer->getMembers()[i]->getX() ][polymer->getMembers()[i]->getY() + 1] == 2 ||grid[polymer->getMembers()[i]->getX()][polymer->getMembers()[i]->getY() + 1] == 1 ){
+                moveArr.erase(moveArr.begin() + 0);
+            }
+            // check move down
+            if(grid[polymer->getMembers()[i]->getX() ][polymer->getMembers()[i]->getY() - 1] == 2 ||grid[polymer->getMembers()[i]->getX()][polymer->getMembers()[i]->getY() - 1] == 1 ){
+                moveArr.erase(moveArr.begin() + 1);
+            }
+            
+            if(grid[polymer->getLeadParticle()->getX()+1][polymer->getLeadParticle()->getY()] == 2 ){
+                moveArr.erase(moveArr.begin() + 3);
+            }
+            if(grid[polymer->getBottomParticle()->getX() - 1][polymer->getBottomParticle()->getY()] == 2){
+                moveArr.erase(moveArr.begin() + 2);
+            }
+        }
+        
+
+    }
+    
+
+    
+}
+
+
+int main()
+{
+    int T = 50;
+    srand((unsigned)time(NULL));
+    cout << calculatePolymerMoveProbability() << endl;
+//    ofstream F1("FinalTimes.txt");
+//    ofstream F2("adsorptionParticles.txt");
+//    ofstream F3("FinalParticlesUsingSIze.txt");
+    
+     vector<Particle*> particles;
+    vector<Particle*> recombinedParticles;
+    vector<int> neighborArrayX;
+    vector<int> neighborArrayY;
+    vector<int> onesArrayX;
+    vector<int> onesArrayY;
+    vector<int> moveArray;
+    vector<Chain*> polymers;
+    
+
+    
+    ofstream F1("particle_positions.txt");
+    const std::string csvFileName = "breakBond_particle_positions.csv";
+    const std::string csvFileName2 = "Breakbond_polymer_positions.csv";
+    const std::string csvFileName3 = "breakBond_final_positions.csv";
+    const std::string csvFileName4 = "breakBond_polymerPositions.csv";
+    std::ofstream outputFile(csvFileName);
+    std::ofstream outputFile2(csvFileName2);
+    std::ofstream outputFile3(csvFileName3);
+    
+    std::ofstream polymerOutputFile(csvFileName4);
+    
+    outputFile << "Timestep,ParticleID,X,Y,Bonded\n";
+    outputFile2 << "PolymerNumber,X,Y\n";
+    outputFile3 << "X, Y,Bonded\n";
+    polymerOutputFile << "Timestep,PolymerID,X,Y\n";
+    
+    int grid[100][100];
+    for(int i =0; i < dim; i++){
+        for(int j = 0; j < dim; j++){
+            grid[i][j] = 0;
+        }
+    }
+    
+
+    
+    
+//
+    populate(100, particles, grid);
+    
+//    Particle* p4 = new Particle(4, 3, "p4", 4, false);
+//    grid[4][3] = 1;
+//    particles.push_back(p4);
+//
+//
+//
+//    Particle* p6 = new Particle(4, 4, "name", 6, false);
+//    grid[4][4] = 1;
+//    particles.push_back(p6);
+//    
+//    Particle* p7 = new Particle(4,5,"name",7,false);
+//    grid[4][5] = 1;
+//    particles.push_back(p7);
+//    p7->readyToBond = true;
+//    p7->polymerToBond = 0;
+////
+////
+//    bond(*p4, grid, 4, 4, particles, polymers);
+
+//    Particle* p7 = new Particle(6,5,"name",7,false);
+//    grid[6][5] = 1;
+//    particles.push_back(p7);
+//
+//    Particle* p1 = new Particle(7,5,"name",6,false);
+//    grid[7][5] = 1;
+//    particles.push_back(p1);
+    
+//    bond(*p7,grid,7,5,particles,polymers);
+//
+//
+//    Particle* p2 = new Particle(3,7,"name",2,false);
+//    grid[3][7] = 1;
+//    particles.push_back(p2);
+//
+//    Particle* p3 = new Particle(6,2,"name",3,false);
+//    grid[6][2] = 1;
+//    particles.push_back(p3);
+    
+//    for (int i = 0; i < dim; ++i) {
+//        for (int j = 0; j < dim; ++j) {
+//            cout << grid[i][j] << " ";
+//        }
+//        cout << endl;
+//    }
+//
+//    cout << "INitial positions " << endl;
+//    for(int i=0; i < polymers[0]->getMembers().size(); i++){
+//        cout << polymers[0]->getMembers()[i]->getX() << " , " << polymers[0]->getMembers()[i]->getY() << endl;
+//    }
+    
+    for(int tau = 0; tau < T; tau++){
+        cout << "tau " << tau << endl;
+
+        for(int i = 0; i < particles.size(); i++ ){
+            cout << tau << "," << i << "," << particles[i]->getX() << "," << particles[i]->getY() << ","
+            << particles[i]->getBonded() << endl;
+
+            outputFile << tau << "," << i << "," << particles[i]->getX() << "," << particles[i]->getY() << ","
+                        << particles[i]->getBonded() << "\n";
+            cout << " moving particle : " << i << " ( " << particles[i]->getX() << ", " << particles[i]->getY()<< endl;
+//                        for (int i = 0; i < dim; ++i) {
+//                            for (int j = 0; j < dim; ++j) {
+//                                cout << grid[i][j] << " ";
+//                            }
+//                            cout << endl;
+//                        }
+//            cout << "_______________________________ " << endl;
+            int Cx = -1;
+            int Cy = -1;
+            
+            if(particles[i]->getBonded() == true || particles[i]->recombined == true){
+                continue;
+            }
+            
+            float moveProbability = calculateMoveProbability();
+            float bondProbability = calculateBondProbability();
+            checkNeighborsToBond(particles[i]->getX(), particles[i]->getY(), grid, neighborArrayX, neighborArrayY);
+            
+            if(neighborArrayX.size() != 0){
+                particles[i]->readyToBond = true;
+                cout << " READY TO BOND " << endl;
+            }
+            
+            if(particles[i]->readyToBond == true && RndNum() > bondProbability && particles[i]->getBonded() == false){
+                //bond
+                cout << "bonding" << endl;
+                if(neighborArrayX.size() == 4){
+                    collideW4(particles[i]->getX(),particles[i]->getY(),neighborArrayX,neighborArrayY,Cx,Cy);
+                    bond(*particles[i], grid, Cx, Cy, particles, polymers);
+                    particles[i]->setBonded(true);
+                    int index = findParticle(Cx, Cy, particles);
+                    particles[index]->setBonded(true);
+                    neighborArrayX.clear();
+                    neighborArrayY.clear();
+                    continue;
+                }
+                else if(neighborArrayX.size() == 3){
+                    collideW3(particles[i]->getX(),particles[i]->getY(),neighborArrayX,neighborArrayY,Cx,Cy);
+                    bond(*particles[i], grid, Cx, Cy, particles, polymers);
+                    particles[i]->setBonded(true);
+                    int index = findParticle(Cx, Cy, particles);
+                    particles[index]->setBonded(true);
+                    neighborArrayX.clear();
+                    neighborArrayY.clear();
+                    continue;
+                    
+                }
+                else if(neighborArrayX.size() == 2){
+                    collideW2(particles[i]->getX(),particles[i]->getY(),neighborArrayX,neighborArrayY,Cx,Cy);
+                    bond(*particles[i], grid, Cx, Cy, particles, polymers);
+                    particles[i]->setBonded(true);
+                    int index = findParticle(Cx, Cy, particles);
+                    particles[index]->setBonded(true);
+                    neighborArrayX.clear();
+                    neighborArrayY.clear();
+                    continue;
+                }
+                else if(neighborArrayX.size() == 1){
+                    collideW1(particles[i]->getX(),particles[i]->getY(),neighborArrayX,neighborArrayY,Cx,Cy);
+//                    cout << "particle : " << i << "( " << particles[i]->getX() << " , " << particles[i]->getY() << " ) " << endl;
+//                    cout << "bonding at cx,cy " << Cx << " ,  " << Cy << endl;
+                    bond(*particles[i], grid, Cx, Cy, particles, polymers);
+                    particles[i]->setBonded(true);
+                    int index = findParticle(Cx, Cy, particles);
+//                    cout << "particle:" << index << particles[index]->getX() << " , " << particles[index]->getY() << endl;
+                    particles[index]->setBonded(true);
+//                    cout << "Bonded " << endl;
+                    neighborArrayX.clear();
+                    neighborArrayY.clear();
+                    continue;
+                }
+                else if(particles[i]->polymerToBond != -1){
+                    cout << " Bond to polymer " << endl;
+                    bondToPolymer(*particles[i], grid,particles[i]->getX(), particles[i]->getY(), particles,polymers,particles[i]->polymerToBond);
+                    particles[i]->setBonded(true);
+                    continue;
+                }
+            }
+//            else if (particles[i]->readyToBond == true ){
+//                cout << " RND < BONDPROBABILITY " << endl;
+//            }
+            float rnd = RndNum();
+//            cout << "RND " << rnd << " move proability: " << moveProbability << endl;
+            if(rnd > moveProbability && particles[i]->getBonded() == false){
+                cout << "Moving " << " : " << i  << endl;
+                particles[i]->readyToBond = false;
+                neighborArrayX.clear();
+                neighborArrayY.clear();
+                checkNeighborsToMove(particles[i]->getX(), particles[i]->getY(), grid, neighborArrayX,neighborArrayY);
+                //check directions to move
+                if(neighborArrayX.size() == 4){
+                    cout << "Collide w/ 4 " << endl;
+                    collideW4(particles[i]->getX(),particles[i]->getY(),neighborArrayX,neighborArrayY,Cx,Cy);
+                    if(grid[Cx][Cy] == 3){
+                        particles[i]->readyToBond = true;
+                        int index = findPolymerSite(Cx,Cy,polymers);
+                        particles[i]->polymerToBond = index;
+                        polymers[index] ->readyToBond = true;
+                        polymers[index]->particleToBond = i;
+                    }
+                    grid[particles[i]->getX()][particles[i]->getY()] = 0;
+                    particles[i]->setX(Cx);
+                    particles[i]->setY(Cy);
+                    grid[particles[i]->getX()][particles[i]->getY()] = 1;
+                    neighborArrayX.clear();
+                    neighborArrayY.clear();
+//                    cout << "Moved " << endl;
+                    
+                }
+                else if(neighborArrayX.size() == 3){
+                    collideW3(particles[i]->getX(),particles[i]->getY(),neighborArrayX,neighborArrayY,Cx,Cy);
+                    if(grid[Cx][Cy] == 3){
+                        particles[i]->readyToBond = true;
+                        int index = findPolymerSite(Cx,Cy,polymers);
+                        particles[i]->polymerToBond = index;
+                        polymers[index] ->readyToBond = true;
+                        polymers[index]->particleToBond = i;
+                    }
+                    grid[particles[i]->getX()][particles[i]->getY()] = 0;
+                    particles[i]->setX(Cx);
+                    particles[i]->setY(Cy);
+                    grid[particles[i]->getX()][particles[i]->getY()] = 1;
+                    neighborArrayX.clear();
+                    neighborArrayY.clear();
+                    
+                    
+                }
+                else if(neighborArrayX.size() == 2){
+                    collideW2(particles[i]->getX(),particles[i]->getY(),neighborArrayX,neighborArrayY,Cx,Cy);
+                    if(grid[Cx][Cy] == 3){
+                        particles[i]->readyToBond = true;
+                        int index = findPolymerSite(Cx,Cy,polymers);
+                        particles[i]->polymerToBond = index;
+                        polymers[index] ->readyToBond = true;
+                        polymers[index]->particleToBond = i;
+                    }
+                    grid[particles[i]->getX()][particles[i]->getY()] = 0;
+                    particles[i]->setX(Cx);
+                    particles[i]->setY(Cy);
+                    grid[particles[i]->getX()][particles[i]->getY()] = 1;
+                    neighborArrayX.clear();
+                    neighborArrayY.clear();
+                    
+                }
+                else if(neighborArrayX.size() == 1){
+                    collideW1(particles[i]->getX(),particles[i]->getY(),neighborArrayX,neighborArrayY,Cx,Cy);
+//                    cout << "COllide with 1" << endl;
+                    if(grid[Cx][Cy] == 3){
+                        particles[i]->readyToBond = true;
+                        int index = findPolymerSite(Cx,Cy,polymers);
+                        particles[i]->polymerToBond = index;
+                        polymers[index] ->readyToBond = true;
+                        polymers[index]->particleToBond = i;
+                    }
+                    grid[particles[i]->getX()][particles[i]->getY()] = 0;
+                    particles[i]->setX(Cx);
+                    particles[i]->setY(Cy);
+                    grid[particles[i]->getX()][particles[i]->getY()] = 1;
+                    neighborArrayX.clear();
+                    neighborArrayY.clear();
+                }
+                else{
+                    int oldX = particles[i]->getX();
+                    int oldY = particles[i]->getY();
+                    grid[particles[i]->getX()][particles[i]->getY()] = 0;
+                    particles[i]->move();
+                    grid[particles[i]->getX()][particles[i]->getY()] = 1;
+                }
+
+//                cout << "chekc for ones " << endl;
+                checkFor1s(particles[i]->getX(), particles[i]->getY(), grid, onesArrayX, onesArrayY);
+                if(onesArrayX.size() != 0){
+//                    cout << "One found " << endl;
+                    particles[i]->readyToBond = true;
+                }
+                // move
+                if(particles[i]->readyToBond == true){
+//                    cout << "ready to bond true after move " << endl;
+                    if(RndNum() > bondProbability){
+//                        cout << " bonding after move " << endl;
+                        if(particles[i]->polymerToBond != -1){
+                            bondToPolymer(*particles[i], grid,particles[i]->getX(), particles[i]->getY(), particles,polymers,particles[i]->polymerToBond);
+                            particles[i]->setBonded(true);
+                        }
+
+                        else if(onesArrayX.size() != 0 && particles[i]->getBonded() == false){
+                            if(onesArrayX.size() == 4){
+                                collideW4(particles[i]->getX(),particles[i]->getY(),onesArrayX,onesArrayY,Cx,Cy);
+                                bond(*particles[i], grid, Cx, Cy, particles, polymers);
+                                particles[i]->setBonded(true);
+                                int index = findParticle(Cx, Cy, particles);
+                                particles[index]->setBonded(true);
+                                onesArrayX.clear();
+                                onesArrayY.clear();
+                                
+                            }
+                            else if(onesArrayX.size() == 3){
+                                collideW3(particles[i]->getX(),particles[i]->getY(),onesArrayX,onesArrayY,Cx,Cy);
+                                bond(*particles[i], grid, Cx, Cy, particles, polymers);
+                                particles[i]->setBonded(true);
+                                int index = findParticle(Cx, Cy, particles);
+                                particles[index]->setBonded(true);
+                                onesArrayX.clear();
+                                onesArrayY.clear();
+                                
+                                
+                            }
+                            else if(onesArrayX.size() == 2){
+                                collideW2(particles[i]->getX(),particles[i]->getY(),onesArrayX,onesArrayY,Cx,Cy);
+                                bond(*particles[i], grid, Cx, Cy, particles, polymers);
+                                particles[i]->setBonded(true);
+                                int index = findParticle(Cx, Cy, particles);
+                                particles[index]->setBonded(true);
+                                onesArrayX.clear();
+                                onesArrayY.clear();
+                            }
+                            else if(onesArrayX.size() == 1){
+                
+                                collideW1(particles[i]->getX(),particles[i]->getY(),onesArrayX,onesArrayY,Cx,Cy);
+                                bond(*particles[i], grid, Cx, Cy, particles, polymers);
+                                particles[i]->setBonded(true);
+                                int index = findParticle(Cx, Cy, particles);
+                                particles[index]->setBonded(true);
+                                onesArrayX.clear();
+                                onesArrayY.clear();
+                            }
+                            neighborArrayX.clear();
+                            neighborArrayY.clear();
+                        }
+                        
+                    }
+                    
+                }
+            }
+            
+        }
+            
+        for(int i =0; i < polymers.size(); i++){
+            cout << " polymers size :"  << polymers.size() << endl;
+            moveArray.clear();
+            for(int j =0; j < polymers[i]->getMembers().size(); j++){
+                polymerOutputFile << tau << "," << i << "," << polymers[i]->getMembers()[j]->getX() << "," << polymers[i]->getMembers()[j]->getY() << "\n";
+            }
+            polymers[i]->readyToBond = false;
+            
+            float polymerBreakProbability = calculatePolymerBreakProbability();
+            //change Rnd equality sign when time comes
+            if(RndNum() > polymerBreakProbability ){
+                //break
+                cout << " ready to break polymer " << endl;
+                if(polymers[i]->getMembers().size() == 2){
+                    if(polymers[i]->getOrientation() == 0){
+                        grid[polymers[i]->getLeadParticle()->getX() + 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                        grid[polymers[i]->getBottomParticle()->getX() - 1][polymers[i]->getBottomParticle()->getY()] = 0;
+                    }
+                    else if(polymers[i]->getOrientation() == 1){
+                        grid[polymers[i]->getLeadParticle()->getX() ][polymers[i]->getLeadParticle()->getY() + 1] = 0;
+                        grid[polymers[i]->getBottomParticle()->getX() ][polymers[i]->getBottomParticle()->getY() - 1] = 0;
+                    }
+                    
+                    for(int j =0; j < polymers[i]->getMembers().size(); j++){
+                        polymers[i]->getMembers()[j] ->setBonded(false);
+                        grid[polymers[i]->getMembers()[j]->getX()][polymers[i]->getMembers()[j]->getY()] = 1;
+                    }
+                    
+                    polymers.erase(polymers.begin() + i);
+                    cout << " polymer erased " << endl;
+//                    for (int i = 0; i < dim; ++i) {
+//                        for (int j = 0; j < dim; ++j) {
+//                            cout << grid[i][j] << " ";
+//                        }
+//                        cout << endl;
+//                    }
+                    continue;
+                }
+                if(polymers[i]->getMembers().size() > 2){
+                    cout << " Polymer size > 2 " << endl;
+                    
+                    if(polymers[i]->getOrientation() == 0){
+                        cout << " orientation is 0" << endl;
+                        grid[polymers[i]->getLeadParticle()->getX() + 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                        grid[polymers[i]->getBottomParticle()->getX() - 1][polymers[i]->getBottomParticle()->getY()] = 0;
+                        // top particle unbonds change this to .5
+                        float RND = RndNum();
+                        cout << "Random numebr : " << RND << endl;
+                            if(RND > .5){
+                                cout << " Removing lead particle " << endl;
+                                int X = polymers[i]->getLeadParticle()->getX();
+                                int Y =polymers[i]->getLeadParticle()->getY();
+                                for(int j =0 ; j < polymers[i]->getMembers().size(); j++){
+                                    if(polymers[i]->getMembers()[j]->getX() == X && polymers[i]->getMembers()[j]->getY() == Y){
+                                        polymers[i]->removeMember(j);
+                                    }
+                                }
+
+                                grid[X][Y] = 1;
+                                polymers[i]->getLeadParticle()->setBonded(false);
+                                polymers[i]->getLeadParticle()->readyToBond = true;
+                                polymers[i]->getLeadParticle()->polymerToBond = i;
+                                int p = findParticle(X - 1,Y, particles);
+                                polymers[i]->setLeadParticle(*particles[p]);
+                                polymers[i]->updateGrid(grid, particles);
+                                continue;
+                            }
+                            else if(RND < .5){
+                                cout << " Remove bottom particle " << endl;
+                                int X = polymers[i]->getBottomParticle()->getX();
+                                int Y = polymers[i]->getBottomParticle()->getY();
+                                for(int j =0 ; j < polymers[i]->getMembers().size(); j++){
+                                    if(polymers[i]->getMembers()[j]->getX() == X && polymers[i]->getMembers()[j]->getY() == Y){
+                                        polymers[i]->removeMember(j);
+                                    }
+                                }
+                                grid[X][Y] = 1;
+                                polymers[i]->getBottomParticle()->setBonded(false);
+                                polymers[i]->getBottomParticle()->readyToBond = true;
+                                polymers[i]->getBottomParticle()->polymerToBond = i;
+                                int p = findParticle(X + 1,Y, particles);
+                                polymers[i]->setBottomParticle(*particles[p]);
+                                polymers[i]->updateGrid(grid, particles);
+                                continue;
+                            }
+                    }
+                    else if(polymers[i]->getOrientation() == 1){
+//                        for (int i = 0; i < dim; ++i) {
+//                            for (int j = 0; j < dim; ++j) {
+//                                cout << grid[i][j] << " ";
+//                            }
+//                            cout << endl;
+//                        }
+                        grid[polymers[i]->getLeadParticle()->getX() ][polymers[i]->getLeadParticle()->getY() + 1] = 0;
+                        grid[polymers[i]->getBottomParticle()->getX() ][polymers[i]->getBottomParticle()->getY() - 1] = 0;
+                        
+                        float RND = RndNum();
+                        if(RND > .5){
+                            cout << " Removing Lead Particle" << endl;
+                            int X = polymers[i]->getLeadParticle()->getX();
+                            int Y =polymers[i]->getLeadParticle()->getY();
+                            for(int j =0 ; j < polymers[i]->getMembers().size(); j++){
+                                if(polymers[i]->getMembers()[j]->getX() == X && polymers[i]->getMembers()[j]->getY() == Y){
+                                    polymers[i]->removeMember(j);
+                                }
+                            }
+                            grid[X][Y] = 1;
+                            polymers[i]->getLeadParticle()->setBonded(false);
+                            polymers[i]->getLeadParticle()->readyToBond = true;
+                            polymers[i]->getLeadParticle()->polymerToBond = i;
+                            int p = findParticle(X ,Y - 1, particles);
+                            polymers[i]->setLeadParticle(*particles[p]);
+                            polymers[i]->updateGrid(grid, particles);
+                            continue;
+                            
+                        }
+                        else if(RND < .5){
+                            cout << "Removing bottom particle " << endl;
+                            int X = polymers[i]->getBottomParticle()->getX();
+                            int Y = polymers[i]->getBottomParticle()->getY();
+                            for(int j =0 ; j < polymers[i]->getMembers().size(); j++){
+                                if(polymers[i]->getMembers()[j]->getX() == X && polymers[i]->getMembers()[j]->getY() == Y){
+                                    polymers[i]->removeMember(j);
+                                }
+                            }
+                            grid[X][Y] = 1;
+                            polymers[i]->getBottomParticle()->setBonded(false);
+                            polymers[i]->getBottomParticle()->readyToBond = true;
+                            polymers[i]->getBottomParticle()->polymerToBond = i;
+                            int p = findParticle(X ,Y+1, particles);
+                            polymers[i]->setBottomParticle(*particles[p]);
+                            polymers[i]->updateGrid(grid, particles);
+                            continue;
+                            
+                        }
+                    }
+
+                    
+                }
+            }
+            
+            
+            if(polymers[i]->getMembers().size() == 2){
+                float polymerMoveProbability = calculatePolymerMoveProbability();
+                float polymerBondProbaility = calculatePolymerBondProbability();
+                polymerCheckBond(i, grid, polymers[i], particles, polymers);
+                bool justBonded = false;
+                
+                if(polymers[i]->readyToBond == true){
+                    cout << "ready to bond true " << endl;
+                    if(RndNum() > polymerBondProbaility){
+                        if(polymers[i]->particleToBond != -1){
+                            int index = polymers[i]->particleToBond;
+                            particles[index]->setBonded(true);
+                            grid[particles[index]->getX()][particles[index]->getY()] = 2;
+                            polymers[i]->addMember(*particles[index]);
+                            polymers[i]->clearBondingSites();
+                            polymers[i]->updateGrid(grid, particles);
+                            polymers[i]->readyToBond = false;
+                            justBonded = true;
+                        }
+                        else if(polymers[i]->polymerToBond != -1){
+                            cout << "Bonding to polymer" << endl;
+                            int index = polymers[i]->polymerToBond;
+                            if(polymers[i]->getOrientation() == polymers[index]->getOrientation()){
+                                cout << "Size : " << polymers[index]->getMembers().size() << endl;
+                                for(int j = 0; j < polymers[index]->getMembers().size(); j++){
+                                    cout << i << endl;
+                                    polymers[i]->addMember(*polymers[index]->getMembers()[j]);
+                                    cout << " Added member :  " << endl;
+                                    cout << polymers[index]->getMembers()[j]->getX() << " , " << polymers[index]->getMembers()[j]->getY() << endl;
+                                }
+                                polymers.erase(polymers.begin() + index);
+                                polymers[i]->clearBondingSites();
+                                polymers[i]->updateGrid(grid, particles);
+                                polymers[i]->readyToBond = false;
+                                justBonded = true;
+                            }
+                        }
+                    }
+
+                }
+                else if (RndNum() > polymerMoveProbability && justBonded == false){
+                    cout << "READY TO MOVE POLYMER " << endl;
+                    moveArray.clear();
+                    polymerCheckMove(i, grid, polymers[i], particles, polymers, moveArray);
+                    random_device rd;
+                    mt19937 gen(rd());
+                    
+                    // Define a distribution for integers between 0 and the size of the array - 1
+                    uniform_int_distribution<int> dist(0, moveArray.size() - 1);
+                    
+                    // Generate a random index
+                    int random_index = dist(gen);
+                    
+                    // Access the element at the randomly generated index
+                    int movement = moveArray[random_index];
+//                    int movement = 0;
+                    cout << "Random element: " << movement << endl;
+                    
+                    if(movement == 0 ){
+                        //move up
+                        if(polymers[i]->getOrientation() == 1){
+                            cout << "Orientation is 1  " << endl;
+                            grid[polymers[i]->getLeadParticle()->getX() ][polymers[i]->getLeadParticle()->getY() + 1] = 0;
+                            grid[polymers[i]->getBottomParticle()->getX() ][polymers[i]->getBottomParticle()->getY() - 1] = 0;
+                            for(int j = 0; j < polymers[i]->getMembers().size(); j++){
+                                int currentX = polymers[i]->getMembers()[j]->getX();
+                                int currentY = polymers[i]->getMembers()[j]->getY();
+                                grid[currentX][currentY] = 0;
+                                polymers[i]->getMembers()[j]->setY(currentY + 1);
+                                grid[polymers[i]->getMembers()[j]->getX()][polymers[i]->getMembers()[j]->getY()] = 2;
+                            }
+                            polymers[i]->clearBondingSites();
+                            polymers[i]->updateGrid(grid, particles);
+                        }
+                        
+                        if(polymers[i]->getOrientation() == 0){
+                            cout << "Orientation is 0 " << endl;
+                            grid[polymers[i]->getLeadParticle()->getX() + 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                            grid[polymers[i]->getBottomParticle()->getX() - 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                            for(int j = 0; j < polymers[i]->getMembers().size(); j++){
+                                int currentX = polymers[i]->getMembers()[j]->getX();
+                                int currentY = polymers[i]->getMembers()[j]->getY();
+                                grid[currentX][currentY] = 0;
+                                cout << "current y : " << currentY << endl;
+                                polymers[i]->getMembers()[j]->setY(currentY + 1);
+                                cout << "set y :" << polymers[i]->getMembers()[j]->getY() << endl;
+                            }
+                            polymers[i]->clearBondingSites();
+                            polymers[i]->updateGrid(grid, particles);
+                        }
+                    }
+                    else if(movement == 1){
+                        cout << "MOve DOWN " << endl;
+                        //move down
+                        if(polymers[i]->getOrientation() == 1){
+                            grid[polymers[i]->getLeadParticle()->getX() ][polymers[i]->getLeadParticle()->getY() + 1] = 0;
+                            grid[polymers[i]->getBottomParticle()->getX() ][polymers[i]->getBottomParticle()->getY() - 1] = 0;
+                            for(int j = 0; j < polymers[i]->getMembers().size(); j++){
+                                int currentX = polymers[i]->getMembers()[j]->getX();
+                                int currentY = polymers[i]->getMembers()[j]->getY();
+                                grid[currentX][currentY] = 0;
+                                polymers[i]->getMembers()[j]->setY(currentY - 1);
+                                grid[polymers[i]->getMembers()[j]->getX()][polymers[i]->getMembers()[j]->getY()] = 2;
+                            }
+                            polymers[i]->clearBondingSites();
+                            polymers[i]->updateGrid(grid, particles);
+                        }
+                        else if(polymers[i]->getOrientation() == 0){
+                            grid[polymers[i]->getLeadParticle()->getX() + 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                            grid[polymers[i]->getBottomParticle()->getX() - 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                            for(int j = 0; j < polymers[i]->getMembers().size(); j++){
+                                int currentX = polymers[i]->getMembers()[j]->getX();
+                                int currentY = polymers[i]->getMembers()[j]->getY();
+                                grid[currentX][currentY] = 0;
+                                cout << "current y : " << currentY << endl;
+                                polymers[i]->getMembers()[j]->setY(currentY - 1);
+                                cout << "set y :" << polymers[i]->getMembers()[j]->getY() << endl;
+                            }
+                            polymers[i]->clearBondingSites();
+                            polymers[i]->updateGrid(grid, particles);
+                        }
+                    }
+                    else if (movement == 2){
+                        //move left
+                        cout << " Move left " << endl;
+                        if(polymers[i]->getOrientation() == 1){
+                            grid[polymers[i]->getLeadParticle()->getX() ][polymers[i]->getLeadParticle()->getY() + 1] = 0;
+                            grid[polymers[i]->getBottomParticle()->getX() ][polymers[i]->getBottomParticle()->getY() - 1] = 0;
+                            for(int j = 0; j < polymers[i]->getMembers().size(); j++){
+                                int currentX = polymers[i]->getMembers()[j]->getX();
+                                int currentY = polymers[i]->getMembers()[j]->getY();
+                                grid[currentX][currentY] = 0;
+                                polymers[i]->getMembers()[j]->setX(currentX - 1);
+                                grid[polymers[i]->getMembers()[j]->getX()][polymers[i]->getMembers()[j]->getY()] = 2;
+                            }
+                            polymers[i]->clearBondingSites();
+                            polymers[i]->updateGrid(grid, particles);
+                        }
+                        else if(polymers[i]->getOrientation() == 0){
+                            grid[polymers[i]->getLeadParticle()->getX() + 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                            grid[polymers[i]->getBottomParticle()->getX() - 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                            for(int j = 0; j < polymers[i]->getMembers().size(); j++){
+                                int currentX = polymers[i]->getMembers()[j]->getX();
+                                int currentY = polymers[i]->getMembers()[j]->getY();
+                                grid[currentX][currentY] = 0;
+                                cout << "current x : " << currentX << endl;
+                                polymers[i]->getMembers()[j]->setX(currentX - 1);
+                                cout << "set x :" << polymers[i]->getMembers()[j]->getX() << endl;
+                            }
+                            polymers[i]->clearBondingSites();
+                            polymers[i]->updateGrid(grid, particles);
+                        }
+                    }
+                    else if(movement == 3){
+                        //move right
+                        cout << "Move Right " << endl;
+                        if(polymers[i]->getOrientation() == 1){
+                            grid[polymers[i]->getLeadParticle()->getX() ][polymers[i]->getLeadParticle()->getY() + 1] = 0;
+                            grid[polymers[i]->getBottomParticle()->getX() ][polymers[i]->getBottomParticle()->getY() - 1] = 0;
+                            for(int j = 0; j < polymers[i]->getMembers().size(); j++){
+                                int currentX = polymers[i]->getMembers()[j]->getX();
+                                int currentY = polymers[i]->getMembers()[j]->getY();
+                                grid[currentX][currentY] = 0;
+                                polymers[i]->getMembers()[j]->setX(currentX + 1);
+                                grid[polymers[i]->getMembers()[j]->getX()][polymers[i]->getMembers()[j]->getY()] = 2;
+                            }
+                            polymers[i]->clearBondingSites();
+                            polymers[i]->updateGrid(grid, particles);
+                        }
+                        else if(polymers[i]->getOrientation() == 0){
+                            grid[polymers[i]->getLeadParticle()->getX() + 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                            grid[polymers[i]->getBottomParticle()->getX() - 1][polymers[i]->getLeadParticle()->getY()] = 0;
+                            for(int j = 0; j < polymers[i]->getMembers().size(); j++){
+                                int currentX = polymers[i]->getMembers()[j]->getX();
+                                int currentY = polymers[i]->getMembers()[j]->getY();
+                                grid[currentX][currentY] = 0;
+                                cout << "current x : " << currentX << endl;
+                                polymers[i]->getMembers()[j]->setX(currentX + 1);
+                                cout << "set x :" << polymers[i]->getMembers()[j]->getX() << endl;
+                            }
+                            polymers[i]->clearBondingSites();
+                            polymers[i]->updateGrid(grid, particles);
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        }
+    
+        cout << " Final Positions  " << endl;
+        for( int i = 0; i < particles.size(); i++){
+            cout << " ( " << particles[i]->getX() << " , " << particles[i]->getY() << " )" << " Bonded ? : " << particles[i]->getBonded()<< endl;
+            outputFile3 << particles[i]->getX() << " , " << particles[i]->getY() << " , " << particles[i]->getBonded() << endl;
+        }
+        cout << "final number of polymers : " << polymers.size() << endl;
+    
+    if(polymers.size() != 0){
+        for(int i =0; i < polymers.size(); i++){
+            for(int j = 0; j < polymers[i]->getMembers().size(); j++){
+                                outputFile2 << i << "," << polymers[i]->getMembers()[j]->getX()<< " , " << polymers[i]->getMembers()[j]->getY() << "\n";
+            }
+        }
+    }
+//    for (int i = 0; i < dim; ++i) {
+//        for (int j = 0; j < dim; ++j) {
+//            cout << grid[i][j] << " ";
+//        }
+//        cout << endl;
+//    }
+        
+    cout << "Bonding sites " << endl;
+//
+//    for(int i=0; i < 2; i++){
+//        cout << polymers[0]->getXbondingSites()[i] << " , " << polymers[0]->getYbondingSites()[i] << endl;
+//    }
+    
+    cout << "Polymer members" << endl;
+    
+//    for(int i =0; i < polymers[0]->getMembers().size(); i++){
+//        cout << polymers[0]->getMembers()[i] -> getX() << " ," << polymers[0]->getMembers()[i] ->getY() << endl;
+//    }
+        outputFile.close();
+        outputFile2.close();
+    polymerOutputFile.close();
+    
+    return 0;
+    }
